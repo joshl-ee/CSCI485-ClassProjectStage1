@@ -19,6 +19,7 @@ public class TableManagerImpl implements TableManager{
 
   HashMap<String, TableMetadata> tables;
   FDB fdbAPI;
+
   public TableManagerImpl() {
     tables = new HashMap<>();
     fdbAPI = FDB.selectAPIVersion(710);
@@ -102,6 +103,11 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode dropAllTables() {
     // your code
+
+    // Clear all entries in db
+
+    // Clear hash map
+    tables.clear();
     return StatusCode.SUCCESS;
   }
 }
