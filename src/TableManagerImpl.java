@@ -28,7 +28,6 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode createTable(String tableName, String[] attributeNames, AttributeType[] attributeType,
                          String[] primaryKeyAttributeNames) {
-
     // Check if table name is unique
     for (String table : tables.keySet()) {
       if (tableName.equals(table)) return StatusCode.TABLE_ALREADY_EXISTS;
@@ -60,18 +59,20 @@ public class TableManagerImpl implements TableManager{
     // Table doesn't exist
     if (tables.get(tableName) == null) return StatusCode.TABLE_NOT_FOUND;
 
-    // Remove rows from FoundationDB
+    // Remove table-specific key-value pairs
     try {
+      //Open Database
       Database db = fdbAPI.open();
       Transaction tr = db.createTransaction();
-      // Remove all key-value pairs with keys starting with "prefix"
+
+      // TODO: Remove all key-value pairs with keys with tableName in tuple. **Check if implemented correctly**
       byte[] prefix = tableName.getBytes();
       byte[] end = KeySelector.firstGreaterThan(prefix).getKey();
       Range range = new Range(prefix, end);
       tr.clear(range);
 
-      // Commit the transaction
-      tr.commit().join();
+      // TODO: Commit the transaction
+      //tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
@@ -90,24 +91,67 @@ public class TableManagerImpl implements TableManager{
 
   @Override
   public StatusCode addAttribute(String tableName, String attributeName, AttributeType attributeType) {
-    // your code
+    // Employee(Name, SSID)
+    // bob,   1
+    // josh, 2
+    // addAttribute( employee, favoriteColor)
+
+    //   key                value
+    // Employee, 1 ,Name -> bob
+    // Employee, 1, SSID -> 1
+    // Employee, 1, favoriteColor -> color
+    // Employee, 2, Name -> josh
+    // Employee, 2, SSID -> 2
+
+    // TODO Check if table exists. If no, return TABLE_NOT_FOUND
+
+    // TODO: Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
+
+    // TODO: Check if attribute type is supported. If no, return ATTRIBUTE_TYPE_NOT_SUPPORTED
+
+    // TODO: Put in new <name, metadata> pair with updated attributeNames and attributeType;
+    tables.put(tableName, new TableMetadata(attributeNames, attributeType, primaryKeyAttributeNames));
+
+
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode dropAttribute(String tableName, String attributeName) {
-    // your code
+    // TODO Check if table exists. If no, return TABLE_NOT_FOUND
+
+    // TODO: Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
+
+    // TODO: Drop all DB entries with the tableName and attributeName in tuple
+
+    // TODO: Put in new <name, metadata> pair with updated attributeNames and attributeType
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode dropAllTables() {
-    // your code
+    // Clear all key-value pairs
+    try {
+      //Open Database
+      Database db = fdbAPI.open();
+      Transaction tr = db.createTransaction();
 
-    // Clear all entries in db
+      // TODO: Remove all key-value pairs. **Check if implemented correctly**
+      byte[] prefix = new byte[]{};
+      byte[] end = new byte[]{(byte) 0xff};
+      Range range = new Range(prefix, end);
+      tr.clear(range);
+
+      // Commit the transaction
+      //tr.commit().join();
+    }
+    catch(Exception e) {
+      System.out.println("Error");
+    }
 
     // Clear hash map
     tables.clear();
+
     return StatusCode.SUCCESS;
   }
 }

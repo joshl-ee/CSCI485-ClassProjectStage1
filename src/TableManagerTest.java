@@ -31,6 +31,7 @@ public class TableManagerTest {
    */
   @Test
   public void unitTest1() {
+    System.out.println("Here");
     tableManager.dropAllTables();
 
     TableMetadata EmployeeTable = new TableMetadata(EmployeeTableAttributeNames, EmployeeTableAttributeTypes,
@@ -72,28 +73,28 @@ public class TableManagerTest {
   /**
    * Points: 15
    */
-//  @Test
-//  public void unitTest3() {
-//    tableManager.dropAllTables();
-//
-//    TableMetadata EmployeeTable = new TableMetadata(EmployeeTableAttributeNames, EmployeeTableAttributeTypes,
-//        EmployeeTablePKAttributes);
-//    TableMetadata DepartmentTable = new TableMetadata(DepartmentTableAttributeNames,
-//        DepartmentTableAttributeTypes, DepartmentTablePKAttributes);
-//
-//    assertEquals(StatusCode.SUCCESS, tableManager.createTable(EmployeeTableName,
-//        EmployeeTableAttributeNames, EmployeeTableAttributeTypes, EmployeeTablePKAttributes));
-//    assertEquals(StatusCode.SUCCESS, tableManager.createTable(DepartmentTableName,
-//        DepartmentTableAttributeNames, DepartmentTableAttributeTypes, DepartmentTablePKAttributes));
-//    HashMap<String, TableMetadata> tables = tableManager.listTables();
-//    assertEquals(2, tables.size());
-//    assertEquals(EmployeeTable, tables.get(EmployeeTableName));
-//    assertEquals(DepartmentTable, tables.get(DepartmentTableName));
-//  }
-//
-//  /**
-//   * Points: 15
-//   */
+  @Test
+  public void unitTest3() {
+    tableManager.dropAllTables();
+
+    TableMetadata EmployeeTable = new TableMetadata(EmployeeTableAttributeNames, EmployeeTableAttributeTypes,
+        EmployeeTablePKAttributes);
+    TableMetadata DepartmentTable = new TableMetadata(DepartmentTableAttributeNames,
+        DepartmentTableAttributeTypes, DepartmentTablePKAttributes);
+
+    assertEquals(StatusCode.SUCCESS, tableManager.createTable(EmployeeTableName,
+        EmployeeTableAttributeNames, EmployeeTableAttributeTypes, EmployeeTablePKAttributes));
+    assertEquals(StatusCode.SUCCESS, tableManager.createTable(DepartmentTableName,
+        DepartmentTableAttributeNames, DepartmentTableAttributeTypes, DepartmentTablePKAttributes));
+    HashMap<String, TableMetadata> tables = tableManager.listTables();
+    assertEquals(2, tables.size());
+    assertEquals(EmployeeTable, tables.get(EmployeeTableName));
+    assertEquals(DepartmentTable, tables.get(DepartmentTableName));
+  }
+
+  /**
+   * Points: 15
+   */
 //  @Test
 //  public void unitTest4() {
 //    tableManager.dropAllTables();
@@ -165,7 +166,7 @@ public class TableManagerTest {
 //    assertEquals(DepartmentTable, tables.get(DepartmentTableName));
 //    assertEquals(WorksForTable, tables.get(WorksForTableName));
 //  }
-//
+
 //  /**
 //   * Points: 15
 //   */
