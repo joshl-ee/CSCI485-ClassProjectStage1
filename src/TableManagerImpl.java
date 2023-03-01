@@ -110,7 +110,7 @@ public class TableManagerImpl implements TableManager{
     // TODO: Check if attribute type is supported. If no, return ATTRIBUTE_TYPE_NOT_SUPPORTED
 
     // TODO: Put in new <name, metadata> pair with updated attributeNames and attributeType;
-    tables.put(tableName, new TableMetadata(attributeNames, attributeType, primaryKeyAttributeNames));
+    //tables.put(tableName, new TableMetadata(attributeName, attributeType, primaryKeyAttributeNames));
 
 
     return StatusCode.SUCCESS;
