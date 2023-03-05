@@ -65,7 +65,7 @@ public class TableManagerImpl implements TableManager{
       Database db = fdbAPI.open();
       Transaction tr = db.createTransaction();
 
-      // TODO: Remove all key-value pairs with keys with tableName in tuple. **Check if implemented correctly**
+      // Remove all key-value pairs with keys with tableName in tuple. TODO: **Check if implemented correctly**
       byte[] prefix = tableName.getBytes();
       byte[] end = KeySelector.firstGreaterThan(prefix).getKey();
       Range range = new Range(prefix, end);
@@ -103,28 +103,41 @@ public class TableManagerImpl implements TableManager{
     // Employee, 2, Name -> josh
     // Employee, 2, SSID -> 2
 
-    // TODO Check if table exists. If no, return TABLE_NOT_FOUND
+    // Check if table exists. If no, return TABLE_NOT_FOUND
+    if (!tables.containsKey(tableName)) {
+      return StatusCode.TABLE_NOT_FOUND;
+    }
+    // Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
+    TableMetadata table = tables.get(tableName);
+    if (table.doesAttributeExist(attributeName)) {
+      return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
+    }
 
-    // TODO: Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
-
-    // TODO: Check if attribute type is supported. If no, return ATTRIBUTE_TYPE_NOT_SUPPORTED
-
-    // TODO: Put in new <name, metadata> pair with updated attributeNames and attributeType;
-    //tables.put(tableName, new TableMetadata(attributeName, attributeType, primaryKeyAttributeNames));
-
+    // Update TableMetadata for given table
+    table.addAttribute(attributeName, attributeType);
 
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode dropAttribute(String tableName, String attributeName) {
-    // TODO Check if table exists. If no, return TABLE_NOT_FOUND
+    // Check if table exists. If no, return TABLE_NOT_FOUND
+    if (!tables.containsKey(tableName)) {
+      return StatusCode.TABLE_NOT_FOUND;
+    }
 
-    // TODO: Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
+    // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
+    TableMetadata table = tables.get(tableName);
+    if (!table.doesAttributeExist(attributeName)) {
+      return StatusCode.ATTRIBUTE_NOT_FOUND;
+    }
 
     // TODO: Drop all DB entries with the tableName and attributeName in tuple
 
-    // TODO: Put in new <name, metadata> pair with updated attributeNames and attributeType
+
+    // Remove attribute from TableMetadata
+    table.getAttributes().remove(attributeName);
+
     return StatusCode.SUCCESS;
   }
 
