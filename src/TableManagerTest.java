@@ -230,6 +230,7 @@ public class TableManagerTest {
         assertEquals(StatusCode.SUCCESS, tableManager.dropAttribute(EmployeeTableName, attributeName));
       }
     }
+
     HashMap<String, TableMetadata> tables = tableManager.listTables();
     assertEquals(1, tables.size());
     assertEquals(employeeTable, tables.get(EmployeeTableName));

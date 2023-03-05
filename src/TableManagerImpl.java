@@ -17,8 +17,8 @@ import com.apple.foundationdb.tuple.Tuple;
  */
 public class TableManagerImpl implements TableManager{
 
-  HashMap<String, TableMetadata> tables;
-  FDB fdbAPI;
+  private HashMap<String, TableMetadata> tables;
+  private FDB fdbAPI;
 
   public TableManagerImpl() {
     tables = new HashMap<>();
@@ -66,9 +66,8 @@ public class TableManagerImpl implements TableManager{
       Transaction tr = db.createTransaction();
 
       // Remove all key-value pairs with keys with tableName in tuple. TODO: **Check if implemented correctly**
-      byte[] prefix = tableName.getBytes();
-      byte[] end = KeySelector.firstGreaterThan(prefix).getKey();
-      Range range = new Range(prefix, end);
+      Tuple tuple = Tuple.from(tableName);
+      Range range = tuple.range();
       tr.clear(range);
 
       // TODO: Commit the transaction
@@ -133,7 +132,22 @@ public class TableManagerImpl implements TableManager{
     }
 
     // TODO: Drop all DB entries with the tableName and attributeName in tuple
+    try {
+      //Open Database
+      Database db = fdbAPI.open();
+      Transaction tr = db.createTransaction();
 
+      // Remove all key-value pairs with keys with tableName and attributeName in tuple.
+      Tuple tuple = Tuple.from(tableName, attributeName);
+      Range range = tuple.range();
+      tr.clear(range);
+
+      // TODO: Commit the transaction
+      //tr.commit().join();
+    }
+    catch(Exception e) {
+      System.out.println("Error");
+    }
 
     // Remove attribute from TableMetadata
     table.getAttributes().remove(attributeName);
@@ -144,22 +158,8 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode dropAllTables() {
     // Clear all key-value pairs
-    try {
-      //Open Database
-      Database db = fdbAPI.open();
-      Transaction tr = db.createTransaction();
-
-      // TODO: Remove all key-value pairs. **Check if implemented correctly**
-      byte[] prefix = new byte[]{};
-      byte[] end = new byte[]{(byte) 0xff};
-      Range range = new Range(prefix, end);
-      tr.clear(range);
-
-      // Commit the transaction
-      //tr.commit().join();
-    }
-    catch(Exception e) {
-      System.out.println("Error");
+    for (String tableName : tables.keySet()) {
+      deleteTable(tableName);
     }
 
     // Clear hash map
