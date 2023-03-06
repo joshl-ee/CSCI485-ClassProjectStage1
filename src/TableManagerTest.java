@@ -31,7 +31,6 @@ public class TableManagerTest {
    */
   @Test
   public void unitTest1() {
-    System.out.println("Here");
     tableManager.dropAllTables();
 
     TableMetadata EmployeeTable = new TableMetadata(EmployeeTableAttributeNames, EmployeeTableAttributeTypes,

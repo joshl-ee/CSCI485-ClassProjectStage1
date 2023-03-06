@@ -19,10 +19,11 @@ public class TableManagerImpl implements TableManager{
 
   private HashMap<String, TableMetadata> tables;
   private FDB fdbAPI;
-
+  private Database db;
   public TableManagerImpl() {
     tables = new HashMap<>();
     fdbAPI = FDB.selectAPIVersion(710);
+    db = fdbAPI.open();
   }
 
   @Override
@@ -71,7 +72,7 @@ public class TableManagerImpl implements TableManager{
       tr.clear(range);
 
       // TODO: Commit the transaction
-      //tr.commit().join();
+      tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
@@ -96,11 +97,11 @@ public class TableManagerImpl implements TableManager{
     // addAttribute( employee, favoriteColor)
 
     //   key                value
-    // Employee, 1 ,Name -> bob
-    // Employee, 1, SSID -> 1
-    // Employee, 1, favoriteColor -> color
-    // Employee, 2, Name -> josh
-    // Employee, 2, SSID -> 2
+    // Employee, Name, 1 -> bob
+    // Employee, SSID, 1 -> 1
+    // Employee, favoriteColor, 1 -> color
+    // Employee, Name, 2 -> josh
+    // Employee, SSID, 2 -> 2
 
     // Check if table exists. If no, return TABLE_NOT_FOUND
     if (!tables.containsKey(tableName)) {
@@ -143,7 +144,7 @@ public class TableManagerImpl implements TableManager{
       tr.clear(range);
 
       // TODO: Commit the transaction
-      //tr.commit().join();
+      tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
