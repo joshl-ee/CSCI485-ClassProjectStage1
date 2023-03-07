@@ -96,7 +96,7 @@ public class TableManagerImpl implements TableManager{
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
     }
     finally {
-      tr.commit();
+      tr.commit().join();
     }
     return StatusCode.SUCCESS;
   }
@@ -119,7 +119,6 @@ public class TableManagerImpl implements TableManager{
     List<String> tableNames = root.list(db, PathUtil.from()).join();
     Transaction tr = db.createTransaction();
     for (String tableName : tableNames) {
-      System.out.println(tableName);
       // TODO: make TableMetadata for each tableName
       Range range = root.open(db, PathUtil.from(tableName, "metadata")).join().range();
       List<KeyValue> keyvalues = tr.getRange(range).asList().join();
@@ -145,7 +144,7 @@ public class TableManagerImpl implements TableManager{
 
       tables.put(tableName, new TableMetadata(names, types, pks));
     }
-    tr.commit();
+    tr.commit().join();
     return tables;
   }
 
@@ -169,9 +168,9 @@ public class TableManagerImpl implements TableManager{
     // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
 
     // TODO: Drop all DB entries with the tableName and attributeName in tuple
+    Transaction tr = db.createTransaction();
     try {
       //Open Database
-      Transaction tr = db.createTransaction();
 
       // Remove all key-value pairs with keys with tableName and attributeName in tuple.
       Tuple tuple = Tuple.from(tableName, attributeName);
@@ -179,10 +178,12 @@ public class TableManagerImpl implements TableManager{
       tr.clear(range);
 
       // TODO: Commit the transaction
-      //tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
+    }
+    finally {
+      tr.commit().join();
     }
 
     // Remove attribute from TableMetadata
