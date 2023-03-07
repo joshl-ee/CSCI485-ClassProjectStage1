@@ -132,7 +132,7 @@ public class TableManagerImpl implements TableManager{
     Transaction tr = db.createTransaction();
     for (String tableName : tableNames) {
       // TODO: make TableMetadata for each tableName
-      Range range = root.open(tr, PathUtil.from(tableName)).join().range();
+      Range range = root.open(db, PathUtil.from(tableName)).join().range();
       List<KeyValue> keyvalues = tr.getRange(range).asList().join();
 
       ArrayList<String> attributeNames = new ArrayList<>();
