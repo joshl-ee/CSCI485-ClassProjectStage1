@@ -242,7 +242,8 @@ public class TableManagerImpl implements TableManager{
     }
 
     Tuple tupleStart = new Tuple();
-    root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
+    DirectorySubspace directory = root.open(db, PathUtil.from(tableName, "metadata")).join();
+    tr.clear(directory.pack(Tuple.from(attributeName)));
 
     // Drop all entries in rawdata
 
