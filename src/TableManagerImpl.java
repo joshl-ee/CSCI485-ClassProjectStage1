@@ -146,12 +146,11 @@ public class TableManagerImpl implements TableManager{
         System.out.println("!");
         System.out.println(keyvalue.toString());
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
-        System.out.println(key.getString(1));
-        attributeNames.add(key.getString(0));
-        attributeTypes.add(AttributeType.valueOf(key.getString(1)));
-        System.out.println(AttributeType.valueOf(key.getString(1)));
+        attributeNames.add(key.getString(1));
+        attributeTypes.add(AttributeType.valueOf(key.getString(2)));
+        System.out.println(AttributeType.valueOf(key.getString(2)));
         Tuple value = Tuple.fromBytes(keyvalue.getValue());
-        if (value.getBoolean(0) == true) primaryKeys.add(key.getString(0));
+        if (value.getBoolean(1) == true) primaryKeys.add(key.getString(1));
       }
 
       String[] names = new String[attributeNames.size()];
