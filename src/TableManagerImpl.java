@@ -226,14 +226,21 @@ public class TableManagerImpl implements TableManager{
 
     // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
     boolean found = false;
-    Range range = root.open(db, PathUtil.from(tableName, "metadata", attributeName)).join().range();
+    Range range = root.open(db, PathUtil.from(tableName, "metadata")).join().range();
     List<KeyValue> keyvalues = tr.getRange(range).asList().join();
-    if (keyvalues.isEmpty()) {
+    for (KeyValue keyvalue : keyvalues) {
+      Tuple key = Tuple.fromBytes(keyvalue.getKey());
+      if (attributeName.equals(key.getString(1))) {
+        found = true;
+      }
+    }
+
+    if (found == false) {
       tr.commit().join();
       tr.close();
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
-    System.out.println("HERE");
+
     root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
 
     // Drop all entries in rawdata
