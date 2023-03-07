@@ -2,6 +2,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 import java.lang.String;
+import java.util.Collections;
 import com.apple.foundationdb.Database;
 
 
@@ -142,9 +143,12 @@ public class TableManagerImpl implements TableManager{
 
       String[] names = new String[attributeNames.size()];
       names = attributeNames.toArray(names);
+
       AttributeType[] types = new AttributeType[attributeTypes.size()];
       types = attributeTypes.toArray(types);
+
       String[] pks = new String[primaryKeys.size()];
+      Collections.reverse(primaryKeys);
       pks = primaryKeys.toArray(pks);
 
       tables.put(tableName, new TableMetadata(names, types, pks));
