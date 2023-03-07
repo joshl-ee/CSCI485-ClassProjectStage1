@@ -241,7 +241,8 @@ public class TableManagerImpl implements TableManager{
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
 
-    root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
+    Range removeThis = new Range(Tuple().add(root).add(tableName).add("metadat").add(attributeName));
+    tr.clear(removeThis);
 
     // Drop all entries in rawdata
 
