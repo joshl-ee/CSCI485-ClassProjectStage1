@@ -171,6 +171,7 @@ public class TableManagerImpl implements TableManager{
       tables.put(tableName, new TableMetadata(names, types, pks));
     }
     tr.commit().join();
+    tr.close();
     return tables;
   }
 
@@ -253,6 +254,7 @@ public class TableManagerImpl implements TableManager{
       // TODO: make TableMetadata for each tableName
       root.remove(db, PathUtil.from(tableName)).join();
     }
+
     tr.commit().join();
     tr.close();
     return StatusCode.SUCCESS;
