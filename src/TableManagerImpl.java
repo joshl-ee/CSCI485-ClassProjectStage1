@@ -148,9 +148,8 @@ public class TableManagerImpl implements TableManager{
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
         attributeNames.add(key.getString(1));
         attributeTypes.add(AttributeType.valueOf(key.getString(2)));
-        System.out.println(AttributeType.valueOf(key.getString(2)));
         Tuple value = Tuple.fromBytes(keyvalue.getValue());
-        if (value.getBoolean(1) == true) primaryKeys.add(key.getString(1));
+        if (value.getBoolean(0) == true) primaryKeys.add(key.getString(0));
       }
 
       String[] names = new String[attributeNames.size()];
