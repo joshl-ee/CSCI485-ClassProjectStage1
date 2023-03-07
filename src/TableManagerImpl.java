@@ -211,8 +211,9 @@ public class TableManagerImpl implements TableManager{
       // TODO: make TableMetadata for each tableName
       System.out.println(tableName);
       root.remove(tr, PathUtil.from(tableName)).join();
-    }
+      System.out.println(root.exists(db, PathUtil.from(tableName)).join());
 
+    }
     return StatusCode.SUCCESS;
   }
 }
