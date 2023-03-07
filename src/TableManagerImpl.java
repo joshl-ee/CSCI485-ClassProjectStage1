@@ -51,7 +51,10 @@ public class TableManagerImpl implements TableManager{
     Transaction tr = db.createTransaction();
 
     // TODO: Check if table name already exists. Look for tableName in DirectoryLayer
-    if (root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_ALREADY_EXISTS;
+    if (root.exists(db, PathUtil.from(tableName)).join()) {
+      tr.commit().join();
+      return StatusCode.TABLE_ALREADY_EXISTS;
+    }
 
     // Check if attribute parameters are provided and valid
     if (attributeNames == null || attributeType == null ||
@@ -66,7 +69,10 @@ public class TableManagerImpl implements TableManager{
           break;
         }
       }
-      if (!contains) return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
+      if (!contains)  {
+        tr.commit().join();
+        return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
+      }
     }
 
     // TODO: Create tableName in root. Also create subdirectories for the metadata and rawdata
@@ -106,7 +112,10 @@ public class TableManagerImpl implements TableManager{
   public StatusCode deleteTable(String tableName) {
     Transaction tr = db.createTransaction();
 
-    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
+    if (!root.exists(db, PathUtil.from(tableName)).join()) {
+      tr.commit().join();
+      return StatusCode.TABLE_NOT_FOUND;
+    }
 
     root.remove(db, PathUtil.from(tableName)).join();
     tr.commit().join();
@@ -160,7 +169,10 @@ public class TableManagerImpl implements TableManager{
     Transaction tr = db.createTransaction();
 
     // TODO: Check if tableName exists in DirectoryLayer.
-    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
+    if (!root.exists(db, PathUtil.from(tableName)).join()) {
+      tr.commit().join();
+      return StatusCode.TABLE_NOT_FOUND;
+    }
 
     // TODO: Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
     Range range = root.open(db, PathUtil.from(tableName, "metadata")).join().range();
@@ -192,13 +204,20 @@ public class TableManagerImpl implements TableManager{
     Transaction tr = db.createTransaction();
 
     // Check if table exists. If no, return TABLE_NOT_FOUND
-    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
+    if (!root.exists(db, PathUtil.from(tableName)).join()) {
+      tr.commit().join();
+
+      return StatusCode.TABLE_NOT_FOUND;
+    }
 
     // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
     boolean found = false;
     Range range = root.open(db, PathUtil.from(tableName, "metadata", attributeName)).join().range();
     List<KeyValue> keyvalues = tr.getRange(range).asList().join();
-    if (keyvalues.isEmpty()) return StatusCode.ATTRIBUTE_NOT_FOUND;
+    if (keyvalues.isEmpty()) {
+      tr.commit().join();
+      return StatusCode.ATTRIBUTE_NOT_FOUND;
+    }
 
     root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
 
@@ -219,8 +238,8 @@ public class TableManagerImpl implements TableManager{
       // TODO: make TableMetadata for each tableName
       root.remove(db, PathUtil.from(tableName)).join();
     }
-    tr.commit().join();
 
+    tr.commit().join();
     return StatusCode.SUCCESS;
   }
 }
