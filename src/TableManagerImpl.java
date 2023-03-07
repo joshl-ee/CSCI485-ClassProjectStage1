@@ -90,12 +90,13 @@ public class TableManagerImpl implements TableManager{
         tr.set(metadata.pack(keyTuple), valueTuple.pack());
       }
       table.createOrOpen(db, PathUtil.from("rawdata")).join();
-      tr.commit();
     }
     catch(Exception e) {
       System.out.print("Error adding table");
-      tr.commit();
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
+    }
+    finally {
+      tr.commit();
     }
     return StatusCode.SUCCESS;
   }
@@ -130,7 +131,6 @@ public class TableManagerImpl implements TableManager{
 
     // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
     List<String> tableNames = root.list(db, PathUtil.from()).join();
-    Transaction tr = db.createTransaction();
     for (String tableName : tableNames) {
       System.out.println(tableName);
       // TODO: make TableMetadata for each tableName
@@ -145,7 +145,7 @@ public class TableManagerImpl implements TableManager{
         System.out.println("!");
         System.out.println(keyvalue.toString());
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
-        System.out.println(key.getString(0));
+        System.out.println(key.getString(1));
         attributeNames.add(key.getString(0));
         attributeTypes.add(AttributeType.valueOf(key.getString(1)));
         System.out.println(AttributeType.valueOf(key.getString(1)));
