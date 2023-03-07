@@ -103,24 +103,10 @@ public class TableManagerImpl implements TableManager{
 
   @Override
   public StatusCode deleteTable(String tableName) {
-    // TODO: Check if tableName exists in DirectoryLayer.
 
-    // TOOD: Remove the Directory
-    try {
-      // Create transaction
-      Transaction tr = db.createTransaction();
+    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
 
-      // TODO: Remove all key-value pairs in Directory and remove the Directory
-      Tuple tuple = Tuple.from(tableName);
-      Range range = tuple.range();
-      tr.clear(range);
-
-      // Commit the transaction
-      tr.commit().join();
-    }
-    catch(Exception e) {
-      System.out.println("Error");
-    }
+    root.remove(db, PathUtil.from(tableName)).join();
 
     return StatusCode.SUCCESS;
   }
@@ -143,8 +129,6 @@ public class TableManagerImpl implements TableManager{
       ArrayList<String> primaryKeys = new ArrayList<>();
 
       for (KeyValue keyvalue : keyvalues) {
-        System.out.println("!");
-        System.out.println(keyvalue.toString());
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
         attributeNames.add(key.getString(1));
         attributeTypes.add(AttributeType.valueOf(key.getString(2)));
