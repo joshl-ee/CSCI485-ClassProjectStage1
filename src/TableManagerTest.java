@@ -234,9 +234,6 @@ public class TableManagerTest {
 
     HashMap<String, TableMetadata> tables = tableManager.listTables();
     assertEquals(1, tables.size());
-    for (String name : tables.get(EmployeeTableName).getAttributes().keySet()) {
-      System.out.println(name);
-    }
     assertEquals(employeeTable, tables.get(EmployeeTableName));
   }
 }
