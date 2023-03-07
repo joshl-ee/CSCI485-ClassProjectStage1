@@ -240,8 +240,9 @@ public class TableManagerImpl implements TableManager{
       tr.close();
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
-
-    Range removeThis = new Range(Tuple().add(root).add(tableName).add("metadat").add(attributeName));
+    Tuple tupleStart = new Tuple();
+    Tuple tupleEnd = new Tuple();
+    Range removeThis = new Range(tupleStart.add("database").add(tableName).add("metadata").pack(), tupleEnd.add(attributeName).pack());
     tr.clear(removeThis);
 
     // Drop all entries in rawdata
