@@ -145,6 +145,7 @@ public class TableManagerImpl implements TableManager{
 
       tables.put(tableName, new TableMetadata(names, types, pks));
     }
+    tr.commit();
     return tables;
   }
 
