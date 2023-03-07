@@ -183,27 +183,20 @@ public class TableManagerImpl implements TableManager{
 
   @Override
   public StatusCode dropAttribute(String tableName, String attributeName) {
-    // Check if table exists. If no, return TABLE_NOT_FOUND
+    Transaction tr = db.createTransaction();
 
+    // Check if table exists. If no, return TABLE_NOT_FOUND
+    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
 
     // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
+    boolean found = false;
+    Range range = root.open(db, PathUtil.from(tableName, "metadata", attributeName)).join().range();
+    List<KeyValue> keyvalues = tr.getRange(range).asList().join();
+    if (keyvalues.isEmpty()) return StatusCode.ATTRIBUTE_NOT_FOUND;
 
-    // TODO: Drop all DB entries with the tableName and attributeName in tuple
-    Transaction tr = db.createTransaction();
-    try {
-      //Open Database
+    root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
 
-      // Remove all key-value pairs with keys with tableName and attributeName in tuple.
-      Tuple tuple = Tuple.from(tableName, attributeName);
-      Range range = tuple.range();
-      tr.clear(range);
-
-    }
-    catch(Exception e) {
-      System.out.println("Error");
-    }
-    finally {
-    }
+    // Drop all entries in rawdata
 
     // Remove attribute from TableMetadata
     tr.commit().join();
