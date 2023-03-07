@@ -179,7 +179,7 @@ public class TableManagerImpl implements TableManager{
     List<KeyValue> keyvalues = tr.getRange(range).asList().join();
     for (KeyValue keyvalue : keyvalues) {
       Tuple key = Tuple.fromBytes(keyvalue.getKey());
-      if (attributeName == key.getString(2)) {
+      if (attributeName.equals(key.getString(2))) {
         tr.commit().join();
         return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
       }
@@ -206,7 +206,6 @@ public class TableManagerImpl implements TableManager{
     // Check if table exists. If no, return TABLE_NOT_FOUND
     if (!root.exists(db, PathUtil.from(tableName)).join()) {
       tr.commit().join();
-
       return StatusCode.TABLE_NOT_FOUND;
     }
 
