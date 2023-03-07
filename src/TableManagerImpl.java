@@ -93,6 +93,7 @@ public class TableManagerImpl implements TableManager{
     }
     catch(Exception e) {
       System.out.print("Error adding table");
+      tr.commit().join();
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
     }
     finally {
