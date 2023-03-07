@@ -81,7 +81,6 @@ public class TableManagerImpl implements TableManager{
         Boolean pk = false;
         for (int j = 0; j < primaryKeyAttributeNames.length; j++) {
           if (attributeNames[i].equals(primaryKeyAttributeNames[j])) {
-            System.out.println("heer!");
             pk = true;
             break;
           }
@@ -136,7 +135,6 @@ public class TableManagerImpl implements TableManager{
         attributeTypes.add(AttributeType.valueOf(key.getString(2)));
         Tuple value = Tuple.fromBytes(keyvalue.getValue());
         if (value.getBoolean(0) == true) {
-          System.out.println("here!!");
           primaryKeys.add(key.getString(1));
         }
       }
