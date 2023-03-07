@@ -90,6 +90,7 @@ public class TableManagerImpl implements TableManager{
         tr.set(metadata.pack(keyTuple), valueTuple.pack());
       }
       table.createOrOpen(db, PathUtil.from("rawdata")).join();
+      tr.commit();
     }
     catch(Exception e) {
       System.out.print("Error adding table");
