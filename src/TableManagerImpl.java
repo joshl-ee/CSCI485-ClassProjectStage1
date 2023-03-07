@@ -80,6 +80,7 @@ public class TableManagerImpl implements TableManager{
         Boolean pk = false;
         for (int j = 0; j < primaryKeyAttributeNames.length; j++) {
           if (attributeNames[i].equals(primaryKeyAttributeNames[j])) {
+            System.out.println("heer!");
             pk = true;
             break;
           }
