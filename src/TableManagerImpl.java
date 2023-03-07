@@ -209,6 +209,7 @@ public class TableManagerImpl implements TableManager{
 
     for (String tableName : tableNames) {
       // TODO: make TableMetadata for each tableName
+      System.out.println(tableName);
       root.remove(tr, PathUtil.from(tableName)).join();
     }
 
