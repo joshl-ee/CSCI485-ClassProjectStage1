@@ -96,10 +96,10 @@ public class TableManagerImpl implements TableManager{
 
   @Override
   public HashMap<String, TableMetadata> listTables() {
-    // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
-
-    // Dummy hash map
     HashMap<String, TableMetadata> tables = new HashMap<>();
+
+    // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
+    List<String> tableNames = root.list(db, PathUtil.from()).join();
     return tables;
   }
 
