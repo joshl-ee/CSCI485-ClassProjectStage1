@@ -67,12 +67,12 @@ public class TableManagerImpl implements TableManager{
       if (!contains) return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
     }
 
+    Transaction tr = db.createTransaction();
     // TODO: Create tableName in root. Also create subdirectories for the metadata and rawdata
     try {
       DirectorySubspace table = root.createOrOpen(db, PathUtil.from(tableName)).join();
       DirectorySubspace metadata = table.createOrOpen(db, PathUtil.from("metadata")).join();
       // TODO: Add key-value pairs in the "metadata" table that describes attribute and type (attribute name, type) -> (Pk or No)
-      Transaction tr = db.createTransaction();
       for (int i = 0; i < attributeNames.length; i++) {
         Tuple keyTuple = new Tuple();
         keyTuple = keyTuple.add(attributeNames[i]).add(attributeType[i].name());
