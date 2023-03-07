@@ -217,7 +217,7 @@ public class TableManagerImpl implements TableManager{
       tr.commit().join();
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
-
+    System.out.println("HERE");
     root.remove(db, PathUtil.from(tableName, "metadata", attributeName)).join();
 
     // Drop all entries in rawdata
