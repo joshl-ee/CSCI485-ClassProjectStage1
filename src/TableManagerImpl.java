@@ -231,6 +231,7 @@ public class TableManagerImpl implements TableManager{
     for (KeyValue keyvalue : keyvalues) {
       Tuple key = Tuple.fromBytes(keyvalue.getKey());
       if (attributeName.equals(key.getString(1))) {
+        tr.clear(keyvalue.getKey());
         found = true;
       }
     }
@@ -240,10 +241,10 @@ public class TableManagerImpl implements TableManager{
       tr.close();
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
-
-    Tuple tupleStart = new Tuple();
-    DirectorySubspace directory = root.open(db, PathUtil.from(tableName, "metadata")).join();
-    tr.clear(directory.pack(Tuple.from(attributeName)));
+//
+//    Tuple tupleStart = new Tuple();
+//    DirectorySubspace directory = root.open(db, PathUtil.from(tableName, "metadata")).join();
+//    tr.clear(directory.pack(Tuple.from(attributeName)));
 
     // Drop all entries in rawdata
 
