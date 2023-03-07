@@ -47,6 +47,7 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode createTable(String tableName, String[] attributeNames, AttributeType[] attributeType,
                          String[] primaryKeyAttributeNames) {
+    Transaction tr = db.createTransaction();
 
     // TODO: Check if table name already exists. Look for tableName in DirectoryLayer
     if (root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_ALREADY_EXISTS;
@@ -67,7 +68,6 @@ public class TableManagerImpl implements TableManager{
       if (!contains) return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
     }
 
-    Transaction tr = db.createTransaction();
     // TODO: Create tableName in root. Also create subdirectories for the metadata and rawdata
     try {
       DirectorySubspace table = root.createOrOpen(db, PathUtil.from(tableName)).join();
@@ -96,29 +96,29 @@ public class TableManagerImpl implements TableManager{
       tr.commit().join();
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
     }
-    finally {
-      tr.commit().join();
-    }
+
+    tr.commit().join();
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode deleteTable(String tableName) {
+    Transaction tr = db.createTransaction();
 
     if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
 
     root.remove(db, PathUtil.from(tableName)).join();
-
+    tr.commit().join();
     return StatusCode.SUCCESS;
   }
 
   @Override
   public HashMap<String, TableMetadata> listTables() {
     HashMap<String, TableMetadata> tables = new HashMap<>();
+    Transaction tr = db.createTransaction();
 
     // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
     List<String> tableNames = root.list(db, PathUtil.from()).join();
-    Transaction tr = db.createTransaction();
     for (String tableName : tableNames) {
       // TODO: make TableMetadata for each tableName
       Range range = root.open(db, PathUtil.from(tableName, "metadata")).join().range();
@@ -151,13 +151,33 @@ public class TableManagerImpl implements TableManager{
 
   @Override
   public StatusCode addAttribute(String tableName, String attributeName, AttributeType attributeType) {
+    Transaction tr = db.createTransaction();
 
     // TODO: Check if tableName exists in DirectoryLayer.
+    if (!root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_NOT_FOUND;
 
     // TODO: Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
+    Range range = root.open(db, PathUtil.from(tableName, "metadata")).join().range();
+    List<KeyValue> keyvalues = tr.getRange(range).asList().join();
+    for (KeyValue keyvalue : keyvalues) {
+      Tuple key = Tuple.fromBytes(keyvalue.getKey());
+      if (attributeName == key.getString(2)) {
+        tr.commit().join();
+        return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
+      }
+    }
 
-    // TODO:
+    // Add attribute
+    DirectorySubspace metadata = root.open(db, PathUtil.from(tableName, "metadata")).join();
 
+    Tuple keyTuple = new Tuple();
+    keyTuple = keyTuple.add(attributeName).add(attributeType.name());
+    Tuple valueTuple = new Tuple();
+    valueTuple = valueTuple.add(false);
+
+    tr.set(metadata.pack(keyTuple), valueTuple.pack());
+
+    tr.commit().join();
     return StatusCode.SUCCESS;
   }
 
@@ -178,29 +198,29 @@ public class TableManagerImpl implements TableManager{
       Range range = tuple.range();
       tr.clear(range);
 
-      // TODO: Commit the transaction
     }
     catch(Exception e) {
       System.out.println("Error");
     }
     finally {
-      tr.commit().join();
     }
 
     // Remove attribute from TableMetadata
-
+    tr.commit().join();
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode dropAllTables() {
     // Clear all key-value pairs
+    Transaction tr = db.createTransaction();
     List<String> tableNames = root.list(db, PathUtil.from()).join();
 
     for (String tableName : tableNames) {
       // TODO: make TableMetadata for each tableName
       root.remove(db, PathUtil.from(tableName)).join();
     }
+    tr.commit().join();
 
     return StatusCode.SUCCESS;
   }
