@@ -134,7 +134,7 @@ public class TableManagerImpl implements TableManager{
         attributeNames.add(key.getString(1));
         attributeTypes.add(AttributeType.valueOf(key.getString(2)));
         Tuple value = Tuple.fromBytes(keyvalue.getValue());
-        if (value.getBoolean(1) == true) {
+        if (value.getBoolean(0) == true) {
           System.out.println("here!!");
           primaryKeys.add(key.getString(1));
         }
