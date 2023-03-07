@@ -140,6 +140,7 @@ public class TableManagerImpl implements TableManager{
       ArrayList<String> primaryKeys = new ArrayList<>();
 
       for (KeyValue keyvalue : keyvalues) {
+        System.out.println(keyvalue.toString());
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
         System.out.println(key.getString(0));
         attributeNames.add(key.getString(0));
