@@ -131,6 +131,7 @@ public class TableManagerImpl implements TableManager{
 
     // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
     List<String> tableNames = root.list(db, PathUtil.from()).join();
+    Transaction tr = db.createTransaction();
     for (String tableName : tableNames) {
       System.out.println(tableName);
       // TODO: make TableMetadata for each tableName
