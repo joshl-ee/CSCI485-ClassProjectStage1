@@ -50,6 +50,11 @@ public class TableManagerTest {
 
     HashMap<String, TableMetadata> tables = tableManager.listTables();
     assertEquals(1, tables.size());
+
+    for (HashMap.Entry<String, AttributeType> entry : tables.get(EmployeeTableName).getAttributes().entrySet()) {
+      System.out.println(entry.getKey() + " " + entry.getValue().name());
+    }
+
     assertEquals(EmployeeTable, tables.get(EmployeeTableName));
   }
 
