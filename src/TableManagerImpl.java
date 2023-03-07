@@ -58,7 +58,10 @@ public class TableManagerImpl implements TableManager{
 
     // Check if attribute parameters are provided and valid
     if (attributeNames == null || attributeType == null ||
-            primaryKeyAttributeNames == null || attributeNames.length != attributeType.length) return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
+            primaryKeyAttributeNames == null || attributeNames.length != attributeType.length) {
+      tr.commit().join();
+      return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
+    }
 
     // Primary key attributes contains attributes that are not in the attribute definitions
     for (String pk : primaryKeyAttributeNames) {
