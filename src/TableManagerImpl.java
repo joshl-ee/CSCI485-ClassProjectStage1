@@ -204,9 +204,13 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode dropAllTables() {
     // Clear all key-value pairs
+    List<String> tableNames = root.list(db, PathUtil.from()).join();
+    Transaction tr = db.createTransaction();
 
-
-    // Clear hash map
+    for (String tableName : tableNames) {
+      // TODO: make TableMetadata for each tableName
+      root.remove(tr, PathUtil.from(tableName)).join();
+    }
 
     return StatusCode.SUCCESS;
   }
