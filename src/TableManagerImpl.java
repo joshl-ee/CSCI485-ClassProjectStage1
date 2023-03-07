@@ -179,7 +179,7 @@ public class TableManagerImpl implements TableManager{
     List<KeyValue> keyvalues = tr.getRange(range).asList().join();
     for (KeyValue keyvalue : keyvalues) {
       Tuple key = Tuple.fromBytes(keyvalue.getKey());
-      if (attributeName.equals(key.getString(2))) {
+      if (attributeName.equals(key.getString(1))) {
         tr.commit().join();
         return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
       }
