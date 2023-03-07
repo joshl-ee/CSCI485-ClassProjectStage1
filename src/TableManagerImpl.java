@@ -53,6 +53,7 @@ public class TableManagerImpl implements TableManager{
     // TODO: Check if table name already exists. Look for tableName in DirectoryLayer
     if (root.exists(db, PathUtil.from(tableName)).join()) {
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_ALREADY_EXISTS;
     }
 
@@ -60,6 +61,7 @@ public class TableManagerImpl implements TableManager{
     if (attributeNames == null || attributeType == null ||
             primaryKeyAttributeNames == null || attributeNames.length != attributeType.length) {
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
     }
 
@@ -74,6 +76,7 @@ public class TableManagerImpl implements TableManager{
       }
       if (!contains)  {
         tr.commit().join();
+        tr.close();
         return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
       }
     }
@@ -104,10 +107,12 @@ public class TableManagerImpl implements TableManager{
     catch(Exception e) {
       System.out.print("Error adding table");
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_CREATION_ATTRIBUTE_INVALID;
     }
 
     tr.commit().join();
+    tr.close();
     return StatusCode.SUCCESS;
   }
 
@@ -117,11 +122,13 @@ public class TableManagerImpl implements TableManager{
 
     if (!root.exists(db, PathUtil.from(tableName)).join()) {
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_NOT_FOUND;
     }
 
     root.remove(db, PathUtil.from(tableName)).join();
     tr.commit().join();
+    tr.close();
     return StatusCode.SUCCESS;
   }
 
@@ -174,6 +181,7 @@ public class TableManagerImpl implements TableManager{
     // TODO: Check if tableName exists in DirectoryLayer.
     if (!root.exists(db, PathUtil.from(tableName)).join()) {
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_NOT_FOUND;
     }
 
@@ -184,6 +192,7 @@ public class TableManagerImpl implements TableManager{
       Tuple key = Tuple.fromBytes(keyvalue.getKey());
       if (attributeName.equals(key.getString(1))) {
         tr.commit().join();
+        tr.close();
         return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
       }
     }
@@ -199,6 +208,7 @@ public class TableManagerImpl implements TableManager{
     tr.set(metadata.pack(keyTuple), valueTuple.pack());
 
     tr.commit().join();
+    tr.close();
     return StatusCode.SUCCESS;
   }
 
@@ -209,6 +219,7 @@ public class TableManagerImpl implements TableManager{
     // Check if table exists. If no, return TABLE_NOT_FOUND
     if (!root.exists(db, PathUtil.from(tableName)).join()) {
       tr.commit().join();
+      tr.close();
       return StatusCode.TABLE_NOT_FOUND;
     }
 
@@ -218,6 +229,7 @@ public class TableManagerImpl implements TableManager{
     List<KeyValue> keyvalues = tr.getRange(range).asList().join();
     if (keyvalues.isEmpty()) {
       tr.commit().join();
+      tr.close();
       return StatusCode.ATTRIBUTE_NOT_FOUND;
     }
     System.out.println("HERE");
@@ -227,6 +239,7 @@ public class TableManagerImpl implements TableManager{
 
     // Remove attribute from TableMetadata
     tr.commit().join();
+    tr.close();
     return StatusCode.SUCCESS;
   }
 
@@ -240,7 +253,7 @@ public class TableManagerImpl implements TableManager{
       // TODO: make TableMetadata for each tableName
       root.remove(db, PathUtil.from(tableName)).join();
     }
-
+    tr.close();
     tr.commit().join();
     return StatusCode.SUCCESS;
   }
