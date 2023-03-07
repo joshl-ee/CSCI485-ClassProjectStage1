@@ -87,7 +87,7 @@ public class TableManagerImpl implements TableManager{
 
         Tuple valueTuple = new Tuple();
         valueTuple = valueTuple.add(pk);
-        tr.set(table.pack(keyTuple), valueTuple.pack());
+        tr.set(metadata.pack(keyTuple), valueTuple.pack());
       }
       table.createOrOpen(db, PathUtil.from("rawdata")).join();
     }
