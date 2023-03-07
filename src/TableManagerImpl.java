@@ -141,9 +141,10 @@ public class TableManagerImpl implements TableManager{
 
       for (KeyValue keyvalue : keyvalues) {
         Tuple key = Tuple.fromBytes(keyvalue.getKey());
+        System.out.println(key.getString(0));
         attributeNames.add(key.getString(0));
         attributeTypes.add(AttributeType.valueOf(key.getString(1)));
-
+        System.out.println(AttributeType.valueOf(key.getString(1)));
         Tuple value = Tuple.fromBytes(keyvalue.getValue());
         if (value.getBoolean(0) == true) primaryKeys.add(key.getString(0));
       }
@@ -209,10 +210,7 @@ public class TableManagerImpl implements TableManager{
 
     for (String tableName : tableNames) {
       // TODO: make TableMetadata for each tableName
-      System.out.println(tableName);
       root.remove(db, PathUtil.from(tableName)).join();
-      System.out.println(root.exists(db, PathUtil.from(tableName)).join());
-
     }
     return StatusCode.SUCCESS;
   }
