@@ -17,22 +17,37 @@ import com.apple.foundationdb.tuple.Tuple;
  */
 public class TableManagerImpl implements TableManager{
 
-  private HashMap<String, TableMetadata> tables;
   private FDB fdbAPI;
   private Database db;
+  private DirectorySubspace root;
+
   public TableManagerImpl() {
-    tables = new HashMap<>();
+    // Instantiate the Database and open it
     fdbAPI = FDB.selectAPIVersion(710);
-    db = fdbAPI.open();
+    try {
+      db = fdbAPI.open();
+    }
+    catch(Exception e) {
+      System.out.println("Failed to open database");
+    }
+
+    // Instantiate the root directory
+    try {
+      root = DirectoryLayer.getDefault().createOrOpen(db,
+              PathUtil.from("Database")).join();
+    }
+    catch(Exception e) {
+      System.out.println("Failed to create root directory");
+    }
   }
 
   @Override
   public StatusCode createTable(String tableName, String[] attributeNames, AttributeType[] attributeType,
                          String[] primaryKeyAttributeNames) {
-    // Check if table name is unique
-    for (String table : tables.keySet()) {
-      if (tableName.equals(table)) return StatusCode.TABLE_ALREADY_EXISTS;
-    }
+    Transaction tr = db.createTransaction();
+
+    // TODO: Check if table name already exists. Look for tableName in DirectoryLayer
+    if (root.exists(db, PathUtil.from(tableName)).join()) return StatusCode.TABLE_ALREADY_EXISTS;
 
     // Check if attribute parameters are provided and valid
     if (attributeNames == null || attributeType == null ||
@@ -50,71 +65,52 @@ public class TableManagerImpl implements TableManager{
       if (!contains) return StatusCode.TABLE_CREATION_PRIMARY_KEY_NOT_FOUND;
     }
 
-    // No errors, add it
-    tables.put(tableName, new TableMetadata(attributeNames, attributeType, primaryKeyAttributeNames));
+    // TODO: Create a Directory with name tableName at root
+
     return StatusCode.SUCCESS;
   }
 
   @Override
   public StatusCode deleteTable(String tableName) {
-    // Table doesn't exist
-    if (tables.get(tableName) == null) return StatusCode.TABLE_NOT_FOUND;
+    // TODO: Check if tableName exists in DirectoryLayer.
 
-    // Remove table-specific key-value pairs
+    // TOOD: Remove the Directory
     try {
-      //Open Database
-      Database db = fdbAPI.open();
+      // Create transaction
       Transaction tr = db.createTransaction();
 
-      // Remove all key-value pairs with keys with tableName in tuple. TODO: **Check if implemented correctly**
+      // TODO: Remove all key-value pairs in Directory and remove the Directory
       Tuple tuple = Tuple.from(tableName);
       Range range = tuple.range();
       tr.clear(range);
 
-      // TODO: Commit the transaction
+      // Commit the transaction
       tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
     }
 
-    // Remove table from our records
-    tables.remove(tableName);
-
     return StatusCode.SUCCESS;
   }
 
   @Override
   public HashMap<String, TableMetadata> listTables() {
+    // TODO: Iterate through DirectoryLayer and create TableMetadata for each Directory. Add each to HashMap and return.
+
+    // Dummy hash map
+    HashMap<String, TableMetadata> tables = new HashMap<>();
     return tables;
   }
 
   @Override
   public StatusCode addAttribute(String tableName, String attributeName, AttributeType attributeType) {
-    // Employee(Name, SSID)
-    // bob,   1
-    // josh, 2
-    // addAttribute( employee, favoriteColor)
 
-    //   key                value
-    // Employee, Name, 1 -> bob
-    // Employee, SSID, 1 -> 1
-    // Employee, favoriteColor, 1 -> color
-    // Employee, Name, 2 -> josh
-    // Employee, SSID, 2 -> 2
+    // TODO: Check if tableName exists in DirectoryLayer.
 
-    // Check if table exists. If no, return TABLE_NOT_FOUND
-    if (!tables.containsKey(tableName)) {
-      return StatusCode.TABLE_NOT_FOUND;
-    }
-    // Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
-    TableMetadata table = tables.get(tableName);
-    if (table.doesAttributeExist(attributeName)) {
-      return StatusCode.ATTRIBUTE_ALREADY_EXISTS;
-    }
+    // TODO: Check if attribute exists. If yes, return ATTRIBUTE_ALREADY_EXISTS
 
-    // Update TableMetadata for given table
-    table.addAttribute(attributeName, attributeType);
+    // TODO:
 
     return StatusCode.SUCCESS;
   }
@@ -122,20 +118,13 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode dropAttribute(String tableName, String attributeName) {
     // Check if table exists. If no, return TABLE_NOT_FOUND
-    if (!tables.containsKey(tableName)) {
-      return StatusCode.TABLE_NOT_FOUND;
-    }
+
 
     // Check if attribute exists. If no, return ATTRIBUTE_NOT_FOUND
-    TableMetadata table = tables.get(tableName);
-    if (!table.doesAttributeExist(attributeName)) {
-      return StatusCode.ATTRIBUTE_NOT_FOUND;
-    }
 
     // TODO: Drop all DB entries with the tableName and attributeName in tuple
     try {
       //Open Database
-      Database db = fdbAPI.open();
       Transaction tr = db.createTransaction();
 
       // Remove all key-value pairs with keys with tableName and attributeName in tuple.
@@ -144,14 +133,13 @@ public class TableManagerImpl implements TableManager{
       tr.clear(range);
 
       // TODO: Commit the transaction
-      tr.commit().join();
+      //tr.commit().join();
     }
     catch(Exception e) {
       System.out.println("Error");
     }
 
     // Remove attribute from TableMetadata
-    table.getAttributes().remove(attributeName);
 
     return StatusCode.SUCCESS;
   }
@@ -159,12 +147,9 @@ public class TableManagerImpl implements TableManager{
   @Override
   public StatusCode dropAllTables() {
     // Clear all key-value pairs
-    for (String tableName : tables.keySet()) {
-      deleteTable(tableName);
-    }
+
 
     // Clear hash map
-    tables.clear();
 
     return StatusCode.SUCCESS;
   }
