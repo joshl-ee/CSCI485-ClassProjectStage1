@@ -242,9 +242,8 @@ public class TableManagerImpl implements TableManager{
     }
 
     Tuple tupleStart = new Tuple();
-    tupleStart.add(attributeName);
-    Range removeThis = root.open(db, PathUtil.from(tableName, "metadata")).join().range(tupleStart);
-    tr.clear(removeThis);
+    tupleStart.add("database").add(tableName).add("metadata").add(attributeName);
+    tr.clear(tupleStart.pack());
 
     // Drop all entries in rawdata
 
